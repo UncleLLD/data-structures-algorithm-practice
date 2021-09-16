@@ -119,7 +119,53 @@ class Solution:
 
 
 
+方法3:
 
+可以发现，如果nums[i]<nums[i+1]，并且我们从位置 i 向右走到了位置 i+1，那么位置 i左侧的所有位置是不可能在后续的迭代中走到的。
+
+这是因为我们每次向左或向右移动一个位置，要想「折返」到位置 i 以及其左侧的位置，我们首先需要在位置 i+1向左走到位置 i，但这是不可能的。
+
+并且根据方法二，我们知道位置i+1 以及其右侧的位置中一定有一个峰值，因此我们可以设计出如下的一个算法：
+
+对于当前可行的下标范围 l, r，我们随机一个下标 i；
+
+如果下标 i 是峰值，我们返回 i 作为答案；
+
+如果 nums[i]<nums[i+1]，那么我们抛弃[ l,i]的范围，在剩余[ i+1,r] 的范围内继续随机选取下标；
+
+如果 nums[i]>nums[i+1]，那么我们抛弃[ i,r]的范围，在剩余[l,i−1] 的范围内继续随机选取下标。
+
+在上述算法中，如果我们固定选取 i 为[l,r] 的中点，那么每次可行的下标范围会减少一半，成为一个类似二分查找的方法，时间复杂度为 O(logn)。
+
+* python
+
+  ```python
+  class Solution:
+      def findPeakElement(self, nums: List[int]) -> int:
+          n = len(nums)
+  
+          # 辅助函数，输入下标 i，返回 nums[i] 的值
+          # 方便处理 nums[-1] 以及 nums[n] 的边界情况
+          def get(i: int) -> int:
+              if i == -1 or i == n:
+                  return float('-inf')
+              return nums[i]
+        
+          left, right, ans = 0, n - 1, -1
+          while left <= right:
+              mid = left + (right-left) // 2
+              if get(mid - 1) < get(mid) > get(mid + 1):
+                  ans = mid
+                  break
+              if get(mid) < get(mid + 1):
+                  left = mid + 1
+              else:
+                  right = mid - 1
+          
+          return ans
+  ```
+
+  
 
 
 
@@ -137,5 +183,6 @@ class Solution:
 
 方法3:
 
-
+* 时间复杂度：O(logn)，其中 n 是数组nums 的长度。
+* 空间复杂度：O(1)
 
